@@ -3,7 +3,7 @@ public class D48Q18 {
         double baseValue = 3.5;
         int units = 3;
 
-        double width = baseValue* units;
+        double width = baseValue * units;
         System.out.println(width);
     }
 }
