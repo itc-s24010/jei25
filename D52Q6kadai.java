@@ -1,4 +1,4 @@
-public class D52Q6 {
+class D52Q6 {
     public static void main(String[] args) {
         Drink2[] dr = {
                 new Drink2("Gomacola",150),
