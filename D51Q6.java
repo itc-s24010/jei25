@@ -1,50 +1,87 @@
 public class D51Q6 {
     public static void main(String[] args) {
-        Item[] li = {new Item("AA", "魚類"), new Item("BB", "肉類")};
-        Item[] si = {new Item("A1", "さば"), new Item("A2", "さんま"), new Item("B1", "牛肉"), new Item("B2", "鶏肉"), new Item("B3", "豚肉"), new Item("B4", "加工肉")};
-        ItemMaster im = new ItemMaster(li, si);
-        String lcode = args[0].substring(0, 2);
-        String scode = args[0].substring(2, 4);
-        String details = args[0].substring(4);
+        // コマンドシナリオ配列
+        String[] scenario = {
+                "i 100", // 100円投入
+                "i 50",  // 50円投入
+                "b C1",  // C1購入
+                "r",     // 返金
+                "i 500", // 500円投入
+                "b C3"   // C3購入
+        };
 
-        String lname = im.getItemName(im.MAJOR, lcode);
-        String sname = im.getItemName(im.MINOR, scode);
-        System.out.println("商品コード:" + args[0]);
-        System.out.println("大分類名:" + lname);
-        System.out.println("小分類名:" + sname);
-        System.out.println("詳細コード:" + details);
+        // 自動販売機オブジェクト生成
+        VendingMachine vm = new VendingMachine();
+
+        // 配列のコマンドを順番に実行
+        for (String command : scenario) {
+            vm.execCom(command);
+        }
     }
 }
 
-class Item{
+class Drink {
     private String code;
     private String name;
-    Item(String code, String name) {
+    private int price;
+
+    public Drink(String code, String name, int price) {
         this.code = code;
         this.name = name;
+        this.price = price;
     }
-    public String getCode() {
-        return code;
-    }
-    public String getName() {
-        return name;
-    }
+
+    public String getCode() { return code; }
+    public String getName() { return name; }
+    public int getPrice() { return price; }
 }
-class ItemMaster{
-    public int MAJOR = 0;
-    public int MINOR = 1;
-    private Item[][] items;
-    ItemMaster(Item[] major, Item[] minor){
-        items = new Item[2][];
-        items[MAJOR] = major;
-        items[MINOR] = minor;
+
+class VendingMachine {
+    private int total;
+    private Drink[] drinks = {
+            new Drink("C1", "コーラ", 120),
+            new Drink("C2", "水", 100),
+            new Drink("C3", "お茶", 150)
+    };
+
+    public void execCom(String com) {
+        String[] parts = com.split(" ");
+        String cmd = parts[0];
+
+        switch (cmd) {
+            case "i": // 投入
+                int money = Integer.parseInt(parts[1]);
+                total += money;
+                System.out.println(money + "円投入（残額: " + total + "円）");
+                break;
+
+            case "b": // 購入
+                String code = parts[1];
+                buyDrink(code);
+                break;
+
+            case "r": // 返金
+                System.out.println("返金: " + total + "円");
+                total = 0;
+                break;
+
+            default:
+                System.out.println("不明なコマンド: " + com);
+        }
     }
-    public String getItemName(int codeLevel,String code){
-        for (int i = 0;i < items[codeLevel].length;i++){
-            if(code.equals(items[codeLevel][i].getCode())){
-                return items[codeLevel][i].getName();
+
+    private void buyDrink(String code) {
+        for (Drink d : drinks) {
+            if (d.getCode().equals(code)) {
+                if (total >= d.getPrice()) {
+                    total -= d.getPrice();
+                    System.out.println(d.getName() + " を購入（残額: " + total + "円）");
+                } else {
+                    System.out.println("金額不足（必要: " + d.getPrice() + "円）");
+                }
+                return;
             }
         }
-        return "不明";
+        System.out.println("商品コードが存在しません: " + code);
     }
 }
